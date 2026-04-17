@@ -2,7 +2,6 @@ const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
 const links = document.querySelectorAll('.nav-links a');
 const revealElements = document.querySelectorAll('.reveal');
-const progressBars = document.querySelectorAll('.progress-fill');
 const loader = document.getElementById('loader');
 
 const closeMenu = () => {
@@ -44,6 +43,7 @@ const revealObserver = new IntersectionObserver((entries, observer) => {
     entry.target.classList.add('is-visible');
 
     if (entry.target.classList.contains('skill-progress')) {
+      const progressBars = entry.target.querySelectorAll('.progress-fill');
       progressBars.forEach((bar) => {
         bar.style.width = `${bar.dataset.progress || 0}%`;
       });

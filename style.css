@@ -214,6 +214,15 @@ img {
   color: var(--muted);
 }
 
+.hero__meta a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero__meta a:hover {
+  color: var(--text);
+}
+
 .hero__meta i,
 .card h3 i,
 .about-highlights h3 i {
@@ -556,9 +565,8 @@ img {
   }
 
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
