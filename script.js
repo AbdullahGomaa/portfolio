@@ -1,60 +1,64 @@
-// Navigation Toggle
-const navSlide = () => {
-    const burger = document.querySelector('.burger');
-    const nav = document.querySelector('.nav-links');
-    const navLinks = document.querySelectorAll('.nav-links li');
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+const links = document.querySelectorAll('.nav-links a');
+const revealElements = document.querySelectorAll('.reveal');
+const loader = document.getElementById('loader');
 
-    burger.addEventListener('click', () => {
-        // Toggle Nav
-        nav.classList.toggle('nav-active');
+const closeMenu = () => {
+  navLinks.classList.remove('is-open');
+  navToggle.classList.remove('is-open');
+  navToggle.setAttribute('aria-expanded', 'false');
+};
 
-        // Animate Links
-        navLinks.forEach((link, index) => {
-            if (link.style.animation) {
-                link.style.animation = '';
-            } else {
-                link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.3}s`;
-            }
-        });
-
-        // Burger Animation
-        burger.classList.toggle('toggle');
-    });
+if (navToggle && navLinks) {
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.classList.toggle('is-open');
+    navToggle.classList.toggle('is-open', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
+  });
 }
 
-// Scroll Animation for Sections
-const scrollReveal = () => {
-    const reveals = document.querySelectorAll('.section-title, .about-content, .skill-category, .timeline-item, .project-card, .education-block');
+links.forEach((link) => {
+  link.addEventListener('click', () => {
+    closeMenu();
+  });
+});
 
-    reveals.forEach(element => {
-        const windowHeight = window.innerHeight;
-        const elementTop = element.getBoundingClientRect().top;
-        const elementVisible = 150;
+const activateCurrentSection = () => {
+  const fromTop = window.scrollY + 100;
 
-        if (elementTop < windowHeight - elementVisible) {
-            element.classList.add('active');
-            // Adding a simple fade-up inline style for simplicity or toggle a class defined in CSS
-            element.style.opacity = "1";
-            element.style.transform = "translateY(0)";
-            element.style.transition = "all 0.6s ease-out";
-        }
-    });
-}
+  links.forEach((link) => {
+    const section = document.querySelector(link.getAttribute('href'));
+    if (!section) return;
 
-// Initialize
-const app = () => {
-    navSlide();
-    
-    // Set initial state for scroll elements
-    const reveals = document.querySelectorAll('.section-title, .about-content, .skill-category, .timeline-item, .project-card, .education-block');
-    reveals.forEach(el => {
-        el.style.opacity = "0";
-        el.style.transform = "translateY(30px)";
-    });
+    const isActive = section.offsetTop <= fromTop && section.offsetTop + section.offsetHeight > fromTop;
+    link.classList.toggle('active', isActive);
+  });
+};
 
-    window.addEventListener('scroll', scrollReveal);
-    // Trigger once on load
-    scrollReveal();
-}
+const revealObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
 
-app();
+    entry.target.classList.add('is-visible');
+
+    if (entry.target.classList.contains('skill-progress')) {
+      const progressBars = entry.target.querySelectorAll('.progress-fill');
+      progressBars.forEach((bar) => {
+        bar.style.width = `${bar.dataset.progress || 0}%`;
+      });
+    }
+
+    observer.unobserve(entry.target);
+  });
+}, { threshold: 0.15 });
+
+revealElements.forEach((element) => revealObserver.observe(element));
+
+window.addEventListener('scroll', activateCurrentSection, { passive: true });
+window.addEventListener('load', () => {
+  activateCurrentSection();
+  if (loader) {
+    loader.classList.add('loader--hidden');
+  }
+});
